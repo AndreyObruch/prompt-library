@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Библиотека микро-промптов — Руководство</title>
+<title>База промптов — Руководство</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -66,7 +66,7 @@
   .category-card li { margin-bottom: 10px; }
   .category-card a { color: #94a3b8; text-decoration: none; transition: color 0.3s, padding-left 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.95em; }
   .category-card a:hover { color: #fbbf24; padding-left: 5px; }
-  .category-card a::before { content: "📄"; font-size: 0.9em; }
+  .category-card a::before { content: ""; font-size: 0.9em; }
   .structure { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
   .structure h2 { color: #a78bfa; }
   .folder-tree { font-family: 'Courier New', monospace; font-size: 0.95em; line-height: 2; background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid #334155; max-width: 700px; margin: 0 auto 40px; overflow-x: auto; }
@@ -159,7 +159,7 @@
 <body>
 
 <nav class="sticky-nav">
-  <div class="logo">📚 Библиотека промптов</div>
+  <div class="logo">📚 База промптов</div>
   <div class="nav-links">
     <a href="#library">Каталог</a>
     <a href="#algorithm">Алгоритм</a>
@@ -171,7 +171,7 @@
 </nav>
 
 <section class="hero">
-  <h1>📚 Библиотека микро-промптов</h1>
+  <h1>📚 База промптов</h1>
   <div class="subtitle">Руководство пользователя · Версия 2.0</div>
   <div class="meta">
     <span>⏱ 7 минут чтения</span>
@@ -188,7 +188,7 @@
     <div class="category-card">
       <h3>📘 Инструкция</h3>
       <ul>
-        <li><a href="library/prompts/ИНСТРУКЦИЯ ПО ИСПОЛЬЗОВАНИЮ БИБЛИОТЕКИ МИКРО-ПРОМПТОВ.md" target="_blank">Как использовать библиотеку</a></li>
+        <li><a href="library/prompts/ИНСТРУКЦИЯ ПО ИСПОЛЬЗОВАНИЮ БИБЛИОТЕКИ МИКРО-ПРОМПТОВ.md" target="_blank">Как использовать базу</a></li>
       </ul>
     </div>
     <div class="category-card">
@@ -255,7 +255,7 @@
   <div class="steps-container">
     <div class="step-card step-1">
       <div class="step-num">01</div>
-      <div><h3>Определите задачу</h3><p>Чётко сформулируйте, что нужно получить. ❌ «Помоги с кодом» → ✅ «Нужен API-эндпоинт для авторизации по PIN»</p></div>
+      <div><h3>Определите задачу</h3><p>Чётко сформулируйте, что нужно получить.  «Помоги с кодом» → ✅ «Нужен API-эндпоинт для авторизации по PIN»</p></div>
     </div>
     <div class="step-card step-2">
       <div class="step-num">02</div>
@@ -321,7 +321,7 @@
     <div class="rule-card">
       <div class="rule-num">04</div>
       <h3>Используйте мастер-шаблоны</h3>
-      <p>Для сложных задач откройте УНИВЕРСАЛЬНЫЙ МАСТЕР-ШАБЛОН.md и заполните все 5 разделов.</p>
+      <p>Для сложных задач откройте УНИВЕРСАЛЬНЫЙ МАСТЕР-ШАБЛОН и заполните все 5 разделов.</p>
     </div>
   </div>
 </section>
@@ -334,7 +334,7 @@
       <div><h3>Задавайте роль конкретно</h3><p>❌ «Ты — разработчик» → ✅ «Ты — Senior Backend с опытом в Node.js и Vercel»</p></div>
     </div>
     <div class="tip-item">
-      <div class="tip-icon">📊</div>
+      <div class="tip-icon"></div>
       <div><h3>Просите оценку уверенности</h3><p>Добавьте: «Оцени уверенность по шкале 1-10 и укажи, чего не хватает для 10/10»</p></div>
     </div>
     <div class="tip-item">
