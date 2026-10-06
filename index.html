@@ -56,6 +56,17 @@
   .content-item { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; border-left: 4px solid #60a5fa; display: flex; align-items: center; gap: 15px; font-size: 1.1em; transition: transform 0.3s, background 0.3s; }
   .content-item:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
   .content-item .num { background: #60a5fa; color: #0f172a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 1.2em; }
+  .library { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+  .library h2 { color: #fbbf24; }
+  .library-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+  .category-card { background: rgba(255,255,255,0.03); border: 1px solid #334155; border-radius: 12px; padding: 25px; transition: transform 0.3s; }
+  .category-card:hover { transform: translateY(-5px); }
+  .category-card h3 { color: #60a5fa; margin-bottom: 15px; font-size: 1.2em; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+  .category-card ul { list-style: none; padding: 0; }
+  .category-card li { margin-bottom: 10px; }
+  .category-card a { color: #94a3b8; text-decoration: none; transition: color 0.3s, padding-left 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.95em; }
+  .category-card a:hover { color: #fbbf24; padding-left: 5px; }
+  .category-card a::before { content: "📄"; font-size: 0.9em; }
   .structure { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
   .structure h2 { color: #a78bfa; }
   .folder-tree { font-family: 'Courier New', monospace; font-size: 0.95em; line-height: 2; background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid #334155; max-width: 700px; margin: 0 auto 40px; overflow-x: auto; }
@@ -150,8 +161,7 @@
 <nav class="sticky-nav">
   <div class="logo">📚 Библиотека промптов</div>
   <div class="nav-links">
-    <a href="#contents">Оглавление</a>
-    <a href="#structure">Структура</a>
+    <a href="#library">Каталог</a>
     <a href="#algorithm">Алгоритм</a>
     <a href="#examples">Примеры</a>
     <a href="#rules">Правила</a>
@@ -168,40 +178,75 @@
     <span>📅 06.10.2026</span>
     <span>🎯 18 промптов + 3 шаблона</span>
   </div>
-  <a href="library/all-prompts.md" target="_blank" class="download-btn">📥 Скачать библиотеку промптов (.md)</a>
+  <a href="#library" class="download-btn">📂 Перейти к каталогу промптов</a>
   <div class="scroll-indicator">↓</div>
 </section>
 
-<section id="contents" class="contents">
-  <h2>📑 Что внутри</h2>
-  <div class="contents-grid">
-    <div class="content-item"><div class="num">1</div><div>Структура библиотеки</div></div>
-    <div class="content-item"><div class="num">2</div><div>Алгоритм использования (5 шагов)</div></div>
-    <div class="content-item"><div class="num">3</div><div>Примеры из жизни</div></div>
-    <div class="content-item"><div class="num">4</div><div>Правила адаптации промптов</div></div>
-    <div class="content-item"><div class="num">5</div><div>PRO-советы</div></div>
-    <div class="content-item"><div class="num">6</div><div>Типовые ошибки и чеклист</div></div>
-  </div>
-</section>
-
-<section id="structure" class="structure">
-  <h2>🗂 Структура библиотеки</h2>
-  <div class="folder-tree">
-    <div><span class="folder">📁 БИБЛИОТЕКА МИКРО-ПРОМПТОВ/</span></div>
-    <div style="padding-left: 20px;"><span class="folder">├── 1_РАЗРАБОТКА И КОД/</span> <span class="count">(4)</span></div>
-    <div style="padding-left: 20px;"><span class="folder">├── 2_ДОКУМЕНТАЦИЯ/</span> <span class="count">(3)</span></div>
-    <div style="padding-left: 20px;"><span class="folder">├── 3_АНАЛИЗ И ПЛАНИРОВАНИЕ/</span> <span class="count">(3)</span></div>
-    <div style="padding-left: 20px;"><span class="folder">├── 4_UX_UI ПРОЕКТИРОВАНИЕ/</span> <span class="count">(3)</span></div>
-    <div style="padding-left: 20px;"><span class="folder">├── 5_КОММУНИКАЦИЯ И ПРЕЗЕНТАЦИИ/</span> <span class="count">(2)</span></div>
-    <div style="padding-left: 20px;"><span class="folder">└── 6_АВТОМАТИЗАЦИЯ И ОПТИМИЗАЦИЯ/</span> <span class="count">(3)</span></div>
-    <div style="margin-top: 10px;"><span class="file">📄 УНИВЕРСАЛЬНЫЙ МАСТЕР-ШАБЛОН.md</span></div>
-    <div><span class="file">📄 Конструктор.md</span></div>
-    <div><span class="file">📄 Шаблон (История).md</span></div>
-  </div>
-  <div class="stats-row">
-    <div class="stat-box"><div class="number">18</div><div class="label">микро-промптов</div></div>
-    <div class="stat-box"><div class="number">6</div><div class="label">разделов</div></div>
-    <div class="stat-box"><div class="number">3</div><div class="label">мастер-шаблона</div></div>
+<section id="library" class="library">
+  <h2>📂 Каталог промптов</h2>
+  <div class="library-grid">
+    <div class="category-card">
+      <h3>📘 Инструкция</h3>
+      <ul>
+        <li><a href="library/prompts/ИНСТРУКЦИЯ ПО ИСПОЛЬЗОВАНИЮ БИБЛИОТЕКИ МИКРО-ПРОМПТОВ.md" target="_blank">Как использовать библиотеку</a></li>
+      </ul>
+    </div>
+    <div class="category-card">
+      <h3>1. Разработка и код</h3>
+      <ul>
+        <li><a href="library/prompts/1_РАЗРАБОТКА И КОД/1_Генерация API-эндпоинта.md" target="_blank">1. Генерация API-эндпоинта</a></li>
+        <li><a href="library/prompts/1_РАЗРАБОТКА И КОД/2_Рефакторинг компонента.md" target="_blank">2. Рефакторинг компонента</a></li>
+        <li><a href="library/prompts/1_РАЗРАБОТКА И КОД/3_Написание unit-тестов.md" target="_blank">3. Написание unit-тестов</a></li>
+        <li><a href="library/prompts/1_РАЗРАБОТКА И КОД/4_Отладка ошибки.md" target="_blank">4. Отладка ошибки</a></li>
+      </ul>
+    </div>
+    <div class="category-card">
+      <h3>2. Документация</h3>
+      <ul>
+        <li><a href="library/prompts/2_ДОКУМЕНТАЦИЯ/1_Техническое задание на фичу.md" target="_blank">1. Техническое задание на фичу</a></li>
+        <li><a href="library/prompts/2_ДОКУМЕНТАЦИЯ/2_Пользовательская инструкция.md" target="_blank">2. Пользовательская инструкция</a></li>
+        <li><a href="library/prompts/2_ДОКУМЕНТАЦИЯ/3_Обновление README.md" target="_blank">3. Обновление README</a></li>
+      </ul>
+    </div>
+    <div class="category-card">
+      <h3>3. Анализ и планирование</h3>
+      <ul>
+        <li><a href="library/prompts/3_АНАЛИЗ И ПЛАНИРОВАНИЕ/1_Декомпозиция задачи на спринт.md" target="_blank">1. Декомпозиция задачи на спринт</a></li>
+        <li><a href="library/prompts/3_АНАЛИЗ И ПЛАНИРОВАНИЕ/2_Анализ рисков.md" target="_blank">2. Анализ рисков</a></li>
+        <li><a href="library/prompts/3_АНАЛИЗ И ПЛАНИРОВАНИЕ/3_Ретроспектива спринта.md" target="_blank">3. Ретроспектива спринта</a></li>
+      </ul>
+    </div>
+    <div class="category-card">
+      <h3>4. UX/UI проектирование</h3>
+      <ul>
+        <li><a href="library/prompts/4_UX_UI ПРОЕКТИРОВАНИЕ/1_Проектирование экрана.md" target="_blank">1. Проектирование экрана</a></li>
+        <li><a href="library/prompts/4_UX_UI ПРОЕКТИРОВАНИЕ/2_Создание CJM.md" target="_blank">2. Создание CJM</a></li>
+        <li><a href="library/prompts/4_UX_UI ПРОЕКТИРОВАНИЕ/3_UX-копирайтинг.md" target="_blank">3. UX-копирайтинг</a></li>
+      </ul>
+    </div>
+    <div class="category-card">
+      <h3>5. Коммуникация и презентации</h3>
+      <ul>
+        <li><a href="library/prompts/5_КОММУНИКАЦИЯ И ПРЕЗЕНТАЦИИ/1_Структура питча.md" target="_blank">1. Структура питча</a></li>
+        <li><a href="library/prompts/5_КОММУНИКАЦИЯ И ПРЕЗЕНТАЦИИ/2_Подготовка к демо.md" target="_blank">2. Подготовка к демо</a></li>
+      </ul>
+    </div>
+    <div class="category-card">
+      <h3>6. Автоматизация и оптимизация</h3>
+      <ul>
+        <li><a href="library/prompts/6_АВТОМАТИЗАЦИЯ И ОПТИМИЗАЦИЯ/1_SQL-запрос для аналитики.md" target="_blank">1. SQL-запрос для аналитики</a></li>
+        <li><a href="library/prompts/6_АВТОМАТИЗАЦИЯ И ОПТИМИЗАЦИЯ/2_Скрипт автоматизации.md" target="_blank">2. Скрипт автоматизации</a></li>
+        <li><a href="library/prompts/6_АВТОМАТИЗАЦИЯ И ОПТИМИЗАЦИЯ/3_Code Review.md" target="_blank">3. Code Review</a></li>
+      </ul>
+    </div>
+    <div class="category-card">
+      <h3>🛠 Мастер-шаблоны</h3>
+      <ul>
+        <li><a href="library/prompts/УНИВЕРСАЛЬНЫЙ МАСТЕР-ШАБЛОН ПРОМПТА.md" target="_blank">Универсальный мастер-шаблон</a></li>
+        <li><a href="library/prompts/Универсальный шаблон промпта (Конструктор).md" target="_blank">Шаблон-конструктор</a></li>
+        <li><a href="library/prompts/УНИВЕРСАЛЬНЫЙ ШАБЛОН ПРОМПТА (на основе досье История).md" target="_blank">Шаблон на основе досье</a></li>
+      </ul>
+    </div>
   </div>
 </section>
 
