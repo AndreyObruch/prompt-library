@@ -1,407 +1,174 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>База промптов — Руководство</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #0a0a0f;
-    color: #e2e8f0;
-    line-height: 1.6;
-    overflow-x: hidden;
-  }
-  .sticky-nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    background: rgba(10, 10, 15, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 15px 30px; z-index: 1000;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .sticky-nav .logo { font-weight: 700; font-size: 1.1em; color: #a78bfa; }
-  .sticky-nav .nav-links { display: flex; gap: 20px; flex-wrap: wrap; }
-  .sticky-nav a { color: #94a3b8; text-decoration: none; font-size: 0.9em; transition: color 0.3s; }
-  .sticky-nav a:hover { color: #a78bfa; }
-  .hero {
-    min-height: 100vh; display: flex; flex-direction: column;
-    justify-content: center; align-items: center; text-align: center;
-    padding: 100px 20px 60px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    position: relative;
-  }
-  .hero h1 { font-size: clamp(2.5em, 6vw, 4.5em); font-weight: 800; margin-bottom: 20px; text-shadow: 0 4px 30px rgba(0,0,0,0.3); line-height: 1.2; }
-  .hero .subtitle { font-size: clamp(1.2em, 2.5vw, 1.8em); opacity: 0.95; margin-bottom: 40px; max-width: 700px; }
-  .hero .meta { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; font-size: 1em; opacity: 0.9; }
-  .hero .download-btn {
-    display: inline-block; margin-top: 30px; padding: 15px 35px;
-    background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.8);
-    border-radius: 30px; color: white; font-size: 1.1em; font-weight: 600;
-    text-decoration: none; transition: all 0.3s; backdrop-filter: blur(5px);
-  }
-  .hero .download-btn:hover {
-    background: white; color: #764ba2; transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-  }
-  .hero .scroll-indicator { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite; font-size: 2em; opacity: 0.7; }
-  @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(-20px); } 60% { transform: translateX(-50%) translateY(-10px); } }
-  section { padding: 80px 20px; max-width: 1200px; margin: 0 auto; }
-  section h2 { font-size: clamp(2em, 4vw, 3em); margin-bottom: 40px; text-align: center; font-weight: 700; }
-  .contents { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-  .contents h2 { color: #60a5fa; }
-  .contents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
-  .content-item { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; border-left: 4px solid #60a5fa; display: flex; align-items: center; gap: 15px; font-size: 1.1em; transition: transform 0.3s, background 0.3s; }
-  .content-item:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
-  .content-item .num { background: #60a5fa; color: #0f172a; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 1.2em; }
-  .library { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
-  .library h2 { color: #fbbf24; }
-  .library-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
-  .category-card { background: rgba(255,255,255,0.03); border: 1px solid #334155; border-radius: 12px; padding: 25px; transition: transform 0.3s; }
-  .category-card:hover { transform: translateY(-5px); }
-  .category-card h3 { color: #60a5fa; margin-bottom: 15px; font-size: 1.2em; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-  .category-card ul { list-style: none; padding: 0; }
-  .category-card li { margin-bottom: 10px; }
-  .category-card a { color: #94a3b8; text-decoration: none; transition: color 0.3s, padding-left 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.95em; }
-  .category-card a:hover { color: #fbbf24; padding-left: 5px; }
-  .category-card a::before { content: ""; font-size: 0.9em; }
-  .structure { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
-  .structure h2 { color: #a78bfa; }
-  .folder-tree { font-family: 'Courier New', monospace; font-size: 0.95em; line-height: 2; background: rgba(0,0,0,0.4); padding: 30px; border-radius: 12px; border: 1px solid #334155; max-width: 700px; margin: 0 auto 40px; overflow-x: auto; }
-  .folder-tree .folder { color: #60a5fa; }
-  .folder-tree .file { color: #94a3b8; }
-  .folder-tree .count { color: #fbbf24; }
-  .stats-row { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; }
-  .stat-box { background: rgba(167, 139, 250, 0.1); border: 1px solid #a78bfa; padding: 25px 35px; border-radius: 12px; text-align: center; min-width: 150px; }
-  .stat-box .number { font-size: 3em; font-weight: 800; color: #a78bfa; }
-  .stat-box .label { font-size: 1em; opacity: 0.9; margin-top: 5px; }
-  .algorithm { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-  .algorithm h2 { color: #fbbf24; }
-  .steps-container { display: flex; flex-direction: column; gap: 20px; max-width: 800px; margin: 0 auto; }
-  .step-card { padding: 30px; border-radius: 16px; position: relative; display: flex; align-items: center; gap: 25px; transition: transform 0.3s; }
-  .step-card:hover { transform: translateX(10px); }
-  .step-card .step-num { font-size: 3.5em; font-weight: 800; opacity: 0.3; flex-shrink: 0; line-height: 1; }
-  .step-card h3 { font-size: 1.4em; margin-bottom: 8px; }
-  .step-card p { font-size: 1em; opacity: 0.95; }
-  .step-1 { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #1e293b; }
-  .step-2 { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
-  .step-3 { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; }
-  .step-4 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-  .step-5 { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; }
-  .examples { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-  .examples h2 { color: #10b981; }
-  .examples-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1100px; margin: 0 auto; }
-  .example-card { background: rgba(255,255,255,0.03); border: 1px solid #334155; border-radius: 12px; padding: 30px; border-top: 4px solid; transition: transform 0.3s, box-shadow 0.3s; }
-  .example-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-  .example-card.dev { border-top-color: #10b981; }
-  .example-card.doc { border-top-color: #3b82f6; }
-  .example-card.ux { border-top-color: #a78bfa; }
-  .example-card .tag { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.8em; font-weight: 600; margin-bottom: 15px; }
-  .example-card.dev .tag { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-  .example-card.doc .tag { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-  .example-card.ux .tag { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
-  .example-card h3 { font-size: 1.3em; margin-bottom: 12px; }
-  .example-card p { font-size: 0.95em; opacity: 0.9; margin-bottom: 15px; }
-  .example-card .prompt-preview { font-family: monospace; font-size: 0.85em; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; color: #94a3b8; line-height: 1.6; }
-  .rules { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); }
-  .rules h2 { color: #f472b6; }
-  .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1000px; margin: 0 auto; }
-  .rule-card { background: rgba(255,255,255,0.03); border: 1px solid #334155; border-radius: 12px; padding: 30px; transition: transform 0.3s, background 0.3s; }
-  .rule-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); }
-  .rule-card .rule-num { font-size: 2.5em; font-weight: 800; color: #f472b6; margin-bottom: 15px; }
-  .rule-card h3 { font-size: 1.3em; margin-bottom: 12px; }
-  .rule-card p { font-size: 0.95em; opacity: 0.85; line-height: 1.6; }
-  .tips { background: linear-gradient(135deg, #831843 0%, #4c1d95 100%); }
-  .tips h2 { color: #fbcfe8; }
-  .tips-list { max-width: 800px; margin: 0 auto; }
-  .tip-item { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 25px 30px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 20px; transition: transform 0.3s, background 0.3s; }
-  .tip-item:hover { transform: translateX(10px); background: rgba(255,255,255,0.12); }
-  .tip-item .tip-icon { font-size: 2em; flex-shrink: 0; }
-  .tip-item h3 { font-size: 1.2em; margin-bottom: 8px; }
-  .tip-item p { font-size: 0.95em; opacity: 0.95; }
-  .mistakes { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-  .mistakes h2 { color: #ef4444; }
-  .mistakes-table { width: 100%; max-width: 900px; margin: 0 auto; border-collapse: collapse; background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; }
-  .mistakes-table th { background: rgba(239, 68, 68, 0.2); padding: 18px 25px; text-align: left; font-size: 1em; color: #fca5a5; border-bottom: 2px solid #ef4444; }
-  .mistakes-table td { padding: 18px 25px; border-bottom: 1px solid #334155; font-size: 0.95em; }
-  .mistakes-table tr:hover td { background: rgba(255,255,255,0.05); }
-  .mistakes-table .error { color: #fca5a5; font-weight: 600; }
-  .mistakes-table .fix { color: #86efac; }
-  .checklist { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); }
-  .checklist h2 { color: #34d399; }
-  .checklist-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; max-width: 800px; margin: 0 auto; }
-  .check-item { background: rgba(255,255,255,0.05); border: 1px solid #334155; border-radius: 10px; padding: 20px 25px; display: flex; align-items: center; gap: 15px; font-size: 1em; transition: transform 0.3s, background 0.3s; }
-  .check-item:hover { transform: translateX(5px); background: rgba(255,255,255,0.08); }
-  .check-item .checkbox { width: 28px; height: 28px; border: 2px solid #34d399; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #34d399; font-weight: bold; font-size: 1.1em; }
-  .formula { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); text-align: center; padding: 100px 20px; }
-  .formula h2 { font-size: clamp(2em, 4vw, 3em); margin-bottom: 50px; }
-  .formula-box { background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 50px 40px; font-size: clamp(1em, 2vw, 1.3em); line-height: 2.5; max-width: 900px; margin: 0 auto 50px; }
-  .formula-box .component { display: inline-block; background: rgba(255,255,255,0.15); padding: 10px 25px; border-radius: 10px; margin: 5px; font-weight: 600; }
-  .formula-box .equals { font-size: 1.8em; margin: 0 20px; color: #fbbf24; }
-  .formula-box .result { display: inline-block; background: rgba(251, 191, 36, 0.3); padding: 10px 25px; border-radius: 10px; color: #fbbf24; font-weight: 800; }
-  .formula .footer { font-size: 1.1em; opacity: 0.9; }
-  .formula .footer p { margin-bottom: 10px; }
-  @media (max-width: 768px) {
-    .sticky-nav .nav-links { display: none; }
-    .hero { padding: 80px 20px 60px; }
-    section { padding: 60px 15px; }
-    .step-card { flex-direction: column; text-align: center; }
-    .tip-item { flex-direction: column; }
-    .formula-box { padding: 30px 20px; font-size: 0.95em; }
-    .formula-box .component { padding: 8px 15px; font-size: 0.9em; }
-    .mistakes-table { font-size: 0.85em; }
-    .mistakes-table th, .mistakes-table td { padding: 12px 15px; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Библиотека микро-промптов — Руководство</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f4f7f6; }
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        .meta { color: #7f8c8d; font-size: 0.9em; margin-bottom: 20px; }
+        nav { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 30px; text-align: center; }
+        nav a { margin: 0 10px; text-decoration: none; color: #3498db; font-weight: 500; }
+        nav a:hover { text-decoration: underline; }
+        section { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        h2 { color: #2980b9; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        .tree { background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .step { background: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; border-radius: 4px; }
+        .step-num { font-size: 1.5em; font-weight: bold; color: #3498db; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; }
+        .card h3 { margin-top: 0; color: #e67e22; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #f1f1f1; }
+        .formula { background: #e8f5e9; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.2em; font-weight: bold; color: #2e7d32; margin: 20px 0; }
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .checklist li::before { content: "✓ "; color: #27ae60; font-weight: bold; }
+        
+        .contact-block { text-align: center; margin: 40px auto; padding: 25px; max-width: 600px; background-color: #ffffff; border: 2px dashed #3498db; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .contact-block h3 { margin-top: 0; color: #2c3e50; font-size: 1.5em; }
+        .contact-buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
+        .btn { padding: 12px 24px; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; transition: transform 0.2s, box-shadow 0.2s; display: inline-block; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .btn-email { background-color: #EA4335; }
+        .btn-max { background-color: #007bff; }
+        .btn-tg { background-color: #0088cc; }
+    </style>
 </head>
 <body>
+    <header>
+        <h1>📚 Библиотека микро-промптов</h1>
+        <div class="meta">Руководство пользователя · Версия 2.0 ⏱ 7 минут чтения 📅 06.10.2026 🎯 18 промптов + 3 шаблона</div>
+    </header>
 
-<nav class="sticky-nav">
-  <div class="logo">📚 База промптов</div>
-  <div class="nav-links">
-    <a href="#library">Каталог</a>
-    <a href="#algorithm">Алгоритм</a>
-    <a href="#examples">Примеры</a>
-    <a href="#rules">Правила</a>
-    <a href="#tips">Советы</a>
-    <a href="#checklist">Чеклист</a>
-  </div>
-</nav>
+    <nav>
+        <a href="#structure">Структура</a>
+        <a href="#algorithm">Алгоритм</a>
+        <a href="#examples">Примеры</a>
+        <a href="#rules">Правила</a>
+        <a href="#tips">Советы</a>
+        <a href="#checklist">Чеклист</a>
+    </nav>
 
-<section class="hero">
-  <h1>📚 База промптов</h1>
-  <div class="subtitle">Руководство пользователя · Версия 2.0</div>
-  <div class="meta">
-    <span>⏱ 7 минут чтения</span>
-    <span>📅 06.10.2026</span>
-    <span>🎯 18 промптов + 3 шаблона</span>
-  </div>
-  <a href="#library" class="download-btn">📂 Перейти к каталогу промптов</a>
-  <div class="scroll-indicator">↓</div>
-</section>
+    <section id="contents">
+        <h2>📑 Что внутри</h2>
+        <ol>
+            <li>Структура библиотеки</li>
+            <li>Алгоритм использования (5 шагов)</li>
+            <li>Примеры из жизни</li>
+            <li>Правила адаптации промптов</li>
+            <li>PRO-советы</li>
+            <li>Типовые ошибки и чеклист</li>
+        </ol>
+    </section>
 
-<section id="library" class="library">
-  <h2>📂 Каталог промптов</h2>
-  <div class="library-grid">
-    <div class="category-card">
-      <h3>📘 Инструкция</h3>
-      <ul>
-        <li><a href="library/prompts/ИНСТРУКЦИЯ ПО ИСПОЛЬЗОВАНИЮ БИБЛИОТЕКИ МИКРО-ПРОМПТОВ.md" target="_blank">Как использовать базу</a></li>
-      </ul>
-    </div>
-    <div class="category-card">
-      <h3>1. Разработка и код</h3>
-      <ul>
-        <li><a href="library/prompts/1_РАЗРАБОТКА И КОД/1_Генерация API-эндпоинта.md" target="_blank">1. Генерация API-эндпоинта</a></li>
-        <li><a href="library/prompts/1_РАЗРАБОТКА И КОД/2_Рефакторинг компонента.md" target="_blank">2. Рефакторинг компонента</a></li>
-        <li><a href="library/prompts/1_РАЗРАБОТКА И КОД/3_Написание unit-тестов.md" target="_blank">3. Написание unit-тестов</a></li>
-        <li><a href="library/prompts/1_РАЗРАБОТКА И КОД/4_Отладка ошибки.md" target="_blank">4. Отладка ошибки</a></li>
-      </ul>
-    </div>
-    <div class="category-card">
-      <h3>2. Документация</h3>
-      <ul>
-        <li><a href="library/prompts/2_ДОКУМЕНТАЦИЯ/1_Техническое задание на фичу.md" target="_blank">1. Техническое задание на фичу</a></li>
-        <li><a href="library/prompts/2_ДОКУМЕНТАЦИЯ/2_Пользовательская инструкция.md" target="_blank">2. Пользовательская инструкция</a></li>
-        <li><a href="library/prompts/2_ДОКУМЕНТАЦИЯ/3_Обновление README.md" target="_blank">3. Обновление README</a></li>
-      </ul>
-    </div>
-    <div class="category-card">
-      <h3>3. Анализ и планирование</h3>
-      <ul>
-        <li><a href="library/prompts/3_АНАЛИЗ И ПЛАНИРОВАНИЕ/1_Декомпозиция задачи на спринт.md" target="_blank">1. Декомпозиция задачи на спринт</a></li>
-        <li><a href="library/prompts/3_АНАЛИЗ И ПЛАНИРОВАНИЕ/2_Анализ рисков.md" target="_blank">2. Анализ рисков</a></li>
-        <li><a href="library/prompts/3_АНАЛИЗ И ПЛАНИРОВАНИЕ/3_Ретроспектива спринта.md" target="_blank">3. Ретроспектива спринта</a></li>
-      </ul>
-    </div>
-    <div class="category-card">
-      <h3>4. UX/UI проектирование</h3>
-      <ul>
-        <li><a href="library/prompts/4_UX_UI ПРОЕКТИРОВАНИЕ/1_Проектирование экрана.md" target="_blank">1. Проектирование экрана</a></li>
-        <li><a href="library/prompts/4_UX_UI ПРОЕКТИРОВАНИЕ/2_Создание CJM.md" target="_blank">2. Создание CJM</a></li>
-        <li><a href="library/prompts/4_UX_UI ПРОЕКТИРОВАНИЕ/3_UX-копирайтинг.md" target="_blank">3. UX-копирайтинг</a></li>
-      </ul>
-    </div>
-    <div class="category-card">
-      <h3>5. Коммуникация и презентации</h3>
-      <ul>
-        <li><a href="library/prompts/5_КОММУНИКАЦИЯ И ПРЕЗЕНТАЦИИ/1_Структура питча.md" target="_blank">1. Структура питча</a></li>
-        <li><a href="library/prompts/5_КОММУНИКАЦИЯ И ПРЕЗЕНТАЦИИ/2_Подготовка к демо.md" target="_blank">2. Подготовка к демо</a></li>
-      </ul>
-    </div>
-    <div class="category-card">
-      <h3>6. Автоматизация и оптимизация</h3>
-      <ul>
-        <li><a href="library/prompts/6_АВТОМАТИЗАЦИЯ И ОПТИМИЗАЦИЯ/1_SQL-запрос для аналитики.md" target="_blank">1. SQL-запрос для аналитики</a></li>
-        <li><a href="library/prompts/6_АВТОМАТИЗАЦИЯ И ОПТИМИЗАЦИЯ/2_Скрипт автоматизации.md" target="_blank">2. Скрипт автоматизации</a></li>
-        <li><a href="library/prompts/6_АВТОМАТИЗАЦИЯ И ОПТИМИЗАЦИЯ/3_Code Review.md" target="_blank">3. Code Review</a></li>
-      </ul>
-    </div>
-    <div class="category-card">
-      <h3>🛠 Мастер-шаблоны</h3>
-      <ul>
-        <li><a href="library/prompts/УНИВЕРСАЛЬНЫЙ МАСТЕР-ШАБЛОН ПРОМПТА.md" target="_blank">Универсальный мастер-шаблон</a></li>
-        <li><a href="library/prompts/Универсальный шаблон промпта (Конструктор).md" target="_blank">Шаблон-конструктор</a></li>
-        <li><a href="library/prompts/УНИВЕРСАЛЬНЫЙ ШАБЛОН ПРОМПТА (на основе досье История).md" target="_blank">Шаблон на основе досье</a></li>
-      </ul>
-    </div>
-  </div>
-</section>
+    <section id="structure">
+        <h2>🗂 Структура библиотеки</h2>
+        <div class="tree">📁 БИБЛИОТЕКА МИКРО-ПРОМПТОВ/
+├── 1_РАЗРАБОТКА И КОД/ (4)
+├── 2_ДОКУМЕНТАЦИЯ/ (3)
+├── 3_АНАЛИЗ И ПЛАНИРОВАНИЕ/ (3)
+├── 4_UX_UI ПРОЕКТИРОВАНИЕ/ (3)
+├── 5_КОММУНИКАЦИЯ И ПРЕЗЕНТАЦИИ/ (2)
+└── 6_АВТОМАТИЗАЦИЯ И ОПТИМИЗАЦИЯ/ (3)
 
-<section id="algorithm" class="algorithm">
-  <h2>🔄 Алгоритм использования</h2>
-  <div class="steps-container">
-    <div class="step-card step-1">
-      <div class="step-num">01</div>
-      <div><h3>Определите задачу</h3><p>Чётко сформулируйте, что нужно получить.  «Помоги с кодом» → ✅ «Нужен API-эндпоинт для авторизации по PIN»</p></div>
-    </div>
-    <div class="step-card step-2">
-      <div class="step-num">02</div>
-      <div><h3>Выберите промпт</h3><p>Откройте папку по типу задачи: Код → 1_РАЗРАБОТКА, ТЗ → 2_ДОКУМЕНТАЦИЯ, Спринты → 3_АНАЛИЗ, Интерфейсы → 4_UX_UI</p></div>
-    </div>
-    <div class="step-card step-3">
-      <div class="step-num">03</div>
-      <div><h3>Заполните плейсхолдеры</h3><p>Замените всё в [КВАДРАТНЫХ СКОБКАХ] на ваши данные. Добавьте контекст проекта для точности.</p></div>
-    </div>
-    <div class="step-card step-4">
-      <div class="step-num">04</div>
-      <div><h3>Отправьте LLM</h3><p>Вставьте заполненный промпт в чат. LLM ответит структурированно.</p></div>
-    </div>
-    <div class="step-card step-5">
-      <div class="step-num">05</div>
-      <div><h3>Уточняйте</h3><p>Если результат не идеален: добавьте контекст, уточните ограничения, попросите альтернативу.</p></div>
-    </div>
-  </div>
-</section>
+📄 УНИВЕРСАЛЬНЫЙ МАСТЕР-ШАБЛОН.md  Конструктор.md
+📄 Шаблон (История).md</div>
+        <p><strong>18 микро-промптов • 6 разделов • 3 мастер-шаблона</strong></p>
+    </section>
 
-<section id="examples" class="examples">
-  <h2>💡 Примеры из жизни</h2>
-  <div class="examples-grid">
-    <div class="example-card dev">
-      <div class="tag">РАЗРАБОТКА</div>
-      <h3>API для импорта CSV</h3>
-      <p>Создать эндпоинт для WMS с валидацией и обработкой ошибок</p>
-      <div class="prompt-preview">Роль: Backend (Node.js)<br>Задача: POST /api/import<br>Требования: RESTful, идемпотентный, ENV...</div>
-    </div>
-    <div class="example-card doc">
-      <div class="tag">ДОКУМЕНТАЦИЯ</div>
-      <h3>ТЗ для «Точки заказа»</h3>
-      <p>Структурированное ТЗ с критериями приёмки</p>
-      <div class="prompt-preview">Роль: Системный аналитик<br>Задача: ТЗ для функции<br>Контекст: daysLeft=stock/norm...</div>
-    </div>
-    <div class="example-card ux">
-      <div class="tag">UX/UI</div>
-      <h3>Экран уведомлений</h3>
-      <p>Спроектировать экран с состояниями и навигацией</p>
-      <div class="prompt-preview">Роль: UX/UI Designer<br>Задача: Экран "Уведомления"<br>Контекст: Нижняя навигация...</div>
-    </div>
-  </div>
-</section>
+    <section id="algorithm">
+        <h2>🔄 Алгоритм использования</h2>
+        <div class="steps">
+            <div class="step"><div class="step-num">01</div><h4>Определите задачу</h4><p>Чётко сформулируйте, что нужно получить. ❌ «Помоги с кодом» → ✅ «Нужен API-эндпоинт для авторизации по PIN»</p></div>
+            <div class="step"><div class="step-num">02</div><h4>Выберите промпт</h4><p>Откройте папку по типу задачи: Код → 1_РАЗРАБОТКА, ТЗ → 2_ДОКУМЕНТАЦИЯ, Спринты → 3_АНАЛИЗ, Интерфейсы → 4_UX_UI</p></div>
+            <div class="step"><div class="step-num">03</div><h4>Заполните плейсхолдеры</h4><p>Замените всё в [КВАДРАТНЫХ СКОБКАХ] на ваши данные. Добавьте контекст проекта для точности.</p></div>
+            <div class="step"><div class="step-num">04</div><h4>Отправьте LLM</h4><p>Вставьте заполненный промпт в чат. LLM ответит структурированно.</p></div>
+            <div class="step"><div class="step-num">05</div><h4>Уточняйте</h4><p>Если результат не идеален: добавьте контекст, уточните ограничения, попросите альтернативу.</p></div>
+        </div>
+    </section>
 
-<section id="rules" class="rules">
-  <h2>🛠 Как адаптировать промпты</h2>
-  <div class="rules-grid">
-    <div class="rule-card">
-      <div class="rule-num">01</div>
-      <h3>Добавляйте контекст</h3>
-      <p>Чем больше фактов о проекте, тем точнее ответ LLM. Указывайте стек, роли, ограничения.</p>
-    </div>
-    <div class="rule-card">
-      <div class="rule-num">02</div>
-      <h3>Указывайте ограничения</h3>
-      <p>«Только для 2-3 пользователей», «Без внешних мессенджеров», «Работает офлайн» — убирают «воду».</p>
-    </div>
-    <div class="rule-card">
-      <div class="rule-num">03</div>
-      <h3>Требуйте формат вывода</h3>
-      <p>Вместо «сделай хорошо» → «таблица с колонками X, Y, Z» или «один файл с меткой 'создать'».</p>
-    </div>
-    <div class="rule-card">
-      <div class="rule-num">04</div>
-      <h3>Используйте мастер-шаблоны</h3>
-      <p>Для сложных задач откройте УНИВЕРСАЛЬНЫЙ МАСТЕР-ШАБЛОН и заполните все 5 разделов.</p>
-    </div>
-  </div>
-</section>
+    <section id="examples">
+        <h2>💡 Примеры из жизни</h2>
+        <div class="cards">
+            <div class="card"><h3>РАЗРАБОТКА</h3><h4>API для импорта CSV</h4><p>Создать эндпоинт для WMS с валидацией и обработкой ошибок</p><small>Роль: Backend (Node.js)<br>Задача: POST /api/import<br>Требования: RESTful, идемпотентный, ENV...</small></div>
+            <div class="card"><h3>ДОКУМЕНТАЦИЯ</h3><h4>ТЗ для «Точки заказа»</h4><p>Структурированное ТЗ с критериями приёмки</p><small>Роль: Системный аналитик<br>Задача: ТЗ для функции<br>Контекст: daysLeft=stock/norm...</small></div>
+            <div class="card"><h3>UX/UI</h3><h4>Экран уведомлений</h4><p>Спроектировать экран с состояниями и навигацией</p><small>Роль: UX/UI Designer<br>Задача: Экран "Уведомления"<br>Контекст: Нижняя навигация...</small></div>
+        </div>
+    </section>
 
-<section id="tips" class="tips">
-  <h2>⚡ PRO-советы</h2>
-  <div class="tips-list">
-    <div class="tip-item">
-      <div class="tip-icon">🎯</div>
-      <div><h3>Задавайте роль конкретно</h3><p>❌ «Ты — разработчик» → ✅ «Ты — Senior Backend с опытом в Node.js и Vercel»</p></div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-icon"></div>
-      <div><h3>Просите оценку уверенности</h3><p>Добавьте: «Оцени уверенность по шкале 1-10 и укажи, чего не хватает для 10/10»</p></div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-icon">🔄</div>
-      <div><h3>Требуйте альтернативы</h3><p>«Предложи 2 варианта: консервативный (минимум рисков) и инновационный (максимум эффективности)»</p></div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-icon">🧠</div>
-      <div><h3>Используйте Chain of Thought</h3><p>Для сложных задач: «Проговори логические шаги перед финальным выводом»</p></div>
-    </div>
-    <div class="tip-item">
-      <div class="tip-icon">🛡️</div>
-      <div><h3>Запрещайте галлюцинации</h3><p>«Если информации недостаточно, НЕ выдумывай факты. Задай 1-3 уточняющих вопроса»</p></div>
-    </div>
-  </div>
-</section>
+    <section id="rules">
+        <h2>🛠 Как адаптировать промпты</h2>
+        <div class="steps">
+            <div class="step"><div class="step-num">01</div><h4>Добавляйте контекст</h4><p>Чем больше фактов о проекте, тем точнее ответ LLM. Указывайте стек, роли, ограничения.</p></div>
+            <div class="step"><div class="step-num">02</div><h4>Указывайте ограничения</h4><p>«Только для 2-3 пользователей», «Без внешних мессенджеров», «Работает офлайн» — убирают «воду».</p></div>
+            <div class="step"><div class="step-num">03</div><h4>Требуйте формат вывода</h4><p>Вместо «сделай хорошо» → «таблица с колонками X, Y, Z» или «один файл с меткой 'создать'».</p></div>
+            <div class="step"><div class="step-num">04</div><h4>Используйте мастер-шаблоны</h4><p>Для сложных задач откройте УНИВЕРСАЛЬНЫЙ МАСТЕР-ШАБЛОН.md и заполните все 5 разделов.</p></div>
+        </div>
+    </section>
 
-<section id="mistakes" class="mistakes">
-  <h2>❌ Типовые ошибки</h2>
-  <table class="mistakes-table">
-    <thead>
-      <tr><th>Ошибка</th><th>Симптом</th><th>Как исправить</th></tr>
-    </thead>
-    <tbody>
-      <tr><td class="error">Слишком общий промпт</td><td>LLM даёт усреднённый ответ</td><td class="fix">Добавьте контекст и ограничения</td></tr>
-      <tr><td class="error">Нет формата вывода</td><td>«Стена текста»</td><td class="fix">Укажите таблицу/список/файл явно</td></tr>
-      <tr><td class="error">LLM выдумывает факты</td><td>Галлюцинации в ответе</td><td class="fix">Добавьте запрет на галлюцинации</td></tr>
-      <tr><td class="error">Ответ слишком длинный</td><td>Много «воды»</td><td class="fix">Добавьте «лаконично, без воды»</td></tr>
-      <tr><td class="error">Неправильная роль</td><td>Не тот уровень экспертизы</td><td class="fix">Уточните уровень и специализацию</td></tr>
-    </tbody>
-  </table>
-</section>
+    <section id="tips">
+        <h2>⚡ PRO-советы</h2>
+        <div class="cards">
+            <div class="card"><h3>🎯 Задавайте роль конкретно</h3><p>❌ «Ты — разработчик» → ✅ «Ты — Senior Backend с опытом в Node.js и Vercel»</p></div>
+            <div class="card"><h3>📊 Просите оценку уверенности</h3><p>Добавьте: «Оцени уверенность по шкале 1-10 и укажи, чего не хватает для 10/10»</p></div>
+            <div class="card"><h3>🔄 Требуйте альтернативы</h3><p>«Предложи 2 варианта: консервативный (минимум рисков) и инновационный (максимум эффективности)»</p></div>
+            <div class="card"><h3>🧠 Используйте Chain of Thought</h3><p>Для сложных задач: «Проговори логические шаги перед финальным выводом»</p></div>
+            <div class="card"><h3>🛡️ Запрещайте галлюцинации</h3><p>«Если информации недостаточно, НЕ выдумывай факты. Задай 1-3 уточняющих вопроса»</p></div>
+        </div>
+    </section>
 
-<section id="checklist" class="checklist">
-  <h2>✅ Финальный чеклист</h2>
-  <div class="checklist-container">
-    <div class="check-item"><div class="checkbox">✓</div><div>Открыл папку с нужным разделом</div></div>
-    <div class="check-item"><div class="checkbox">✓</div><div>Скопировал промпт полностью</div></div>
-    <div class="check-item"><div class="checkbox">✓</div><div>Заменил все [ПЛЕЙСХОЛДЕРЫ]</div></div>
-    <div class="check-item"><div class="checkbox">✓</div><div>Добавил контекст проекта</div></div>
-    <div class="check-item"><div class="checkbox">✓</div><div>Указал ограничения</div></div>
-    <div class="check-item"><div class="checkbox">✓</div><div>Указал формат вывода</div></div>
-    <div class="check-item"><div class="checkbox">✓</div><div>Проверил роль (конкретная)</div></div>
-    <div class="check-item"><div class="checkbox">✓</div><div>Отправил промпт LLM</div></div>
-  </div>
-</section>
+    <section>
+        <h2>❌ Типовые ошибки</h2>
+        <table>
+            <thead><tr><th>Ошибка</th><th>Симптом</th><th>Как исправить</th></tr></thead>
+            <tbody>
+                <tr><td>Слишком общий промпт</td><td>LLM даёт усреднённый ответ</td><td>Добавьте контекст и ограничения</td></tr>
+                <tr><td>Нет формата вывода</td><td>«Стена текста»</td><td>Укажите таблицу/список/файл явно</td></tr>
+                <tr><td>LLM выдумывает факты</td><td>Галлюцинации в ответе</td><td>Добавьте запрет на галлюцинации</td></tr>
+                <tr><td>Ответ слишком длинный</td><td>Много «воды»</td><td>Добавьте «лаконично, без воды»</td></tr>
+                <tr><td>Неправильная роль</td><td>Не тот уровень экспертизы</td><td>Уточните уровень и специализацию</td></tr>
+            </tbody>
+        </table>
+    </section>
 
-<section class="formula">
-  <h2>🎓 Формула идеального промпта</h2>
-  <div class="formula-box">
-    <span class="component">Роль</span>
-    <span class="component">+</span>
-    <span class="component">Контекст</span>
-    <span class="component">+</span>
-    <span class="component">Задача</span>
-    <span class="component">+</span>
-    <span class="component">Ограничения</span>
-    <span class="component">+</span>
-    <span class="component">Формат</span>
-    <span class="equals">=</span>
-    <span class="result">✅ Результат</span>
-  </div>
-  <div class="footer">
-    <p><strong>Хороший промпт = хороший результат</strong></p>
-    <p style="margin-top: 20px; opacity: 0.8;">Версия 2.0 · 06.10.2026</p>
-  </div>
-</section>
+    <section id="checklist">
+        <h2>✅ Финальный чеклист</h2>
+        <ul class="checklist">
+            <li>Открыл папку с нужным разделом</li>
+            <li>Скопировал промпт полностью</li>
+            <li>Заменил все [ПЛЕЙСХОЛДЕРЫ]</li>
+            <li>Добавил контекст проекта</li>
+            <li>Указал ограничения</li>
+            <li>Указал формат вывода</li>
+            <li>Проверил роль (конкретная)</li>
+            <li>Отправил промпт LLM</li>
+        </ul>
+    </section>
 
+    <div class="formula">
+        <h3>Формула идеального промпта</h3>
+        Роль + Контекст + Задача + Ограничения + Формат = ✅ Результат<br>
+        <small>Хороший промпт = хороший результат</small>
+    </div>
+
+    <!-- БЛОК КНОПОК -->
+    <div class="contact-block">
+        <h3>🚀 Прислать свой промпт</h3>
+        <p>Есть классный промпт? Поделитесь им со мной! Выберите удобный способ связи:</p>
+        <div class="contact-buttons">
+            <a href="mailto:obruch-andrey@yandex.ru" class="btn btn-email">📧 Email</a>
+            <a href="https://max.ru/u/f9LHodD0cOIyDK7dwI-pdzUHpR0XVGkr5zL9PkLK7CfZqNEh9cJs1VauJWQ" target="_blank" class="btn btn-max">💬 Max</a>
+            <a href="https://t.me/Volcano1965" target="_blank" class="btn btn-tg">✈️ Telegram</a>
+        </div>
+    </div>
+
+    <footer style="text-align: center; margin-top: 40px; color: #7f8c8d; font-size: 0.9em;">
+        <p>Версия 2.0 · 06.10.2026</p>
+    </footer>
 </body>
 </html>
